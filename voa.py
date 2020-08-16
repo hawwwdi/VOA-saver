@@ -10,10 +10,10 @@ from datetime import datetime
 from os import mkdir
 from fire import Fire
 from tqdm import tqdm
-#import pdb
+from os.path import expanduser
 
 URL = 'https://gandalf.ddo.jp/'
-SAVE_PATH = r'/home/hawwwdi/voa/'
+SAVE_PATH = expanduser("~") + '/voa/'
 
 
 def today():
@@ -24,10 +24,9 @@ def save(mp3, html, date):
     savePath = rf'{SAVE_PATH}{date}/'
     try:
         mkdir(savePath)
-        print('downloading pdf:')
+        print('download pdf:')
         pdfkit.from_url(html, rf'{savePath}{date}.pdf')
-        #print('pdf downloading finished')
-        print('downloading mp3')
+        print('download mp3:')
         voice = requests.get(mp3, allow_redirects=True, stream=True)
         contentLength = int(voice.headers.get('content-length', 0))
         progress = tqdm(total=contentLength, unit='ib', unit_scale=True)
@@ -36,7 +35,7 @@ def save(mp3, html, date):
                 progress.update(len(data))
                 file.write(data)
             progress.close()
-        print('download compelete')
+        print('download complete')
     except FileExistsError:
         print('file already exists!')
         sys.exit()
@@ -48,13 +47,12 @@ def save(mp3, html, date):
 
 def get(date=today()):
     try:
-        # pdb.set_trace()
         req = requests.get(URL)
         soup = bs4.BeautifulSoup(req.text, 'lxml')
         links = soup.select('table tbody tr td')
         index = [i for i in range(len(links))
                  if str(date) in links[i].text and i % 3 == 2][0]
-        save(links[index-2].a['href'], links[index].a['href'], date)
+        save(links[index - 2].a['href'], links[index].a['href'], date)
     except IndexError:
         print(f'any file found in date: {date} ')
     except:
@@ -64,5 +62,6 @@ def get(date=today()):
 
 
 if __name__ == "__main__":
+    print("save to: ", SAVE_PATH)
     Fire(get)
     pass
