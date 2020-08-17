@@ -3,16 +3,15 @@
 
 import pdfkit
 import requests
-import bs4
 import sys
-import time
 from datetime import datetime
 from os import mkdir
-from fire import Fire
 from tqdm import tqdm
 from os.path import expanduser
 
 URL = 'https://gandalf.ddo.jp/'
+MP3_URL = 'https://gandalf.ddo.jp/mp3/$.mp3'
+PDF_URL = 'https://gandalf.ddo.jp/html/$.html'
 SAVE_PATH = expanduser("~") + '/voa/'
 
 
@@ -45,23 +44,17 @@ def save(mp3, html, date):
     pass
 
 
-def get(date=today()):
-    try:
-        req = requests.get(URL)
-        soup = bs4.BeautifulSoup(req.text, 'lxml')
-        links = soup.select('table tbody tr td')
-        index = [i for i in range(len(links))
-                 if str(date) in links[i].text and i % 3 == 2][0]
-        save(links[index - 2].a['href'], links[index].a['href'], date)
-    except IndexError:
-        print(f'any file found in date: {date} ')
-    except:
-        print('connection Lost!')
-        sys.exit()
+def get(date):
+    mp3 = MP3_URL.replace("$", date)
+    pdf = PDF_URL.replace("$", date)
+    save(mp3, pdf, date)
     pass
 
 
 if __name__ == "__main__":
     print("save to: ", SAVE_PATH)
-    Fire(get)
+    try:
+        get(sys.argv[1])
+    except IndexError:
+        get(today())
     pass
