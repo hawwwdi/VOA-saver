@@ -9,7 +9,7 @@ from os import mkdir
 from tqdm import tqdm
 from os.path import expanduser
 
-URL = 'https://gandalf.ddo.jp/'
+
 MP3_URL = 'https://gandalf.ddo.jp/mp3/$.mp3'
 PDF_URL = 'https://gandalf.ddo.jp/html/$.html'
 SAVE_PATH = expanduser("~") + '/voa/'
